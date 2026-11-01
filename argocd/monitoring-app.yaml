@@ -1,0 +1,59 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: monitoring
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://prometheus-community.github.io/helm-charts
+    chart: kube-prometheus-stack
+    targetRevision: "*"
+    helm:
+      valuesObject:
+        alertmanager:
+          enabled: false
+        kubeControllerManager:
+          enabled: false
+        kubeScheduler:
+          enabled: false
+        kubeProxy:
+          enabled: false
+        kubeEtcd:
+          enabled: false
+        grafana:
+          adminPassword: Lab_grafana
+          service:
+            type: NodePort
+            nodePort: 30300
+          resources:
+            requests:
+              memory: 128Mi
+            limits:
+              memory: 256Mi
+        prometheus:
+          service:
+            type: NodePort
+            nodePort: 30900
+          prometheusSpec:
+            retention: 3d
+            serviceMonitorSelectorNilUsesHelmValues: false
+            podMonitorSelectorNilUsesHelmValues: false
+            ruleSelectorNilUsesHelmValues: false
+            nodeSelector:
+              kubernetes.io/hostname: ansible-controller
+            resources:
+              requests:
+                memory: 400Mi
+              limits:
+                memory: 1Gi
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: monitoring
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
