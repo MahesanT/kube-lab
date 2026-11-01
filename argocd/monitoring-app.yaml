@@ -23,14 +23,19 @@ spec:
           enabled: false
         grafana:
           adminPassword: Lab_grafana
+          env:
+            GF_PLUGINS_PREINSTALL_DISABLED: "true"
+          livenessProbe:
+            initialDelaySeconds: 300
+            failureThreshold: 10
           service:
             type: NodePort
             nodePort: 30300
           resources:
             requests:
-              memory: 128Mi
-            limits:
               memory: 256Mi
+            limits:
+              memory: 512Mi
         prometheus:
           service:
             type: NodePort
