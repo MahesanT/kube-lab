@@ -28,6 +28,8 @@ spec:
           livenessProbe:
             initialDelaySeconds: 300
             failureThreshold: 10
+          nodeSelector:
+            kubernetes.io/hostname: ansible-controller
           service:
             type: NodePort
             nodePort: 30300
